@@ -1,7 +1,8 @@
 import {Resend} from "resend"
 import { APPNAME } from "../constants.js";
 import { generateEmailTemplates } from "./generateEmailTemplates.js";
-const resend=new Resend(process.env.RESEND_API_KEY);
+// const resend=new Resend(process.env.RESEND_API_KEY);
+const resend=""
 
 export const sendEmail = async (to,reason,data,html) => {
     const htmlTemplate=generateEmailTemplates(data.username,data.token,data?.email,reason)

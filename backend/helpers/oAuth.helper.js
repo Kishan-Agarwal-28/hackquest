@@ -13,11 +13,38 @@ const generateAuthUri=(provider,scopes,providerName)=>{
                   });
                   return authorizationUri;
 }
-const registerUserRedirectUri=(provider)=>{
+const registerUserRedirectUri=(provider,integration)=>{
     let scopes;
+   const integrationScopes = [
+    {
+        name: "drive",
+        scope: "https://www.googleapis.com/auth/drive.readonly"
+    },
+    {
+        name: "driveActivity",
+        scope: "https://www.googleapis.com/auth/drive.activity.readonly"
+    },
+    {
+        name: "gmail",
+        scope: "https://www.googleapis.com/auth/gmail.readonly"
+    },
+    {
+        name: "calendar",
+        scope: "https://www.googleapis.com/auth/calendar.readonly"
+    },
+    {
+        name: "calendarFull",
+        scope: "https://www.googleapis.com/auth/calendar"
+    },
+    {
+        name: "docs",
+        scope: "https://www.googleapis.com/auth/documents.readonly"
+    }
+];
+
         switch(provider){
             case "google":
-                scopes = 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile';
+                scopes = `https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile ${integration ? integrationScopes.find(s => s.name === integration)?.scope || '' : ''}`;
                return generateAuthUri(GoogleClient,scopes,"google") 
             case "facebook":
                 scopes = ['email'];
