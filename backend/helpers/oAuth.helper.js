@@ -9,6 +9,7 @@ const generateAuthUri=(provider,scopes,providerName)=>{
                 const authorizationUri = client.authorizeURL({
                     redirect_uri: `http://localhost:3000/api/v1/users/auth/oauth/${providerName}/callback`,
                     scope: scopes,
+                    user_scope: scopes,
                     state: state,
                   });
                   return authorizationUri;

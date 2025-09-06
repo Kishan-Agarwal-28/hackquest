@@ -363,6 +363,7 @@ const handleGoogleOauthCallback = async (req, res) => {
             const accessToken = await client.getToken(tokenParams);
   
             if (accessToken.token) {
+                console.log("here is your token",accessToken.token);
                 const userData=await fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${accessToken.token.access_token}`);
                 const userFromGoogle=await userData.json();
                 const existingUser=await User.findOne({email:userFromGoogle.email});
@@ -789,7 +790,7 @@ const handleSlackOauthCallback = async (req, res) => {
         try {
             const tokenParams = {
                 code: code,
-                redirect_uri: "http://localhost:3000/api/v1/users/auth/oauth/slack/callback",
+                redirect_uri: " http://localhost:3000/api/v1/users/auth/oauth/slack/callback",
             };
         const client = new AuthorizationCode(SlackClient);
         
