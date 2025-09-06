@@ -781,6 +781,105 @@ const handleMicrosoftOauthCallback = async (req, res) => {
     }
 };
 
+
+const handleSlackOauthCallback = async (req, res) => {
+    const { code } = req.query;
+
+     if (code) {
+        try {
+            const tokenParams = {
+                code: code,
+                redirect_uri: "http://localhost:3000/api/v1/users/auth/oauth/slack/callback",
+            };
+        const client = new AuthorizationCode(SlackClient);
+        
+         const accessToken = await client.getToken(tokenParams);
+        if (accessToken.token) {
+    const userData = await fetch("https://slack.com/api/openid.connect.userInfo", {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${accessToken.token.access_token}`
+        }
+    });
+
+    const userFromSlack = await userData.json();
+    console.log(userFromSlack);
+}
+else{
+    throw new Error('Token not returned from Slack API');
+}
+    const existingUser = await User.findOne({ email: userFromSlack.user.email });
+
+if (existingUser) {
+    // Check if Slack is already linked in providers
+    const existingProvider = existingUser.oauth.providers.find(
+        provider => provider.providerName === "slack"
+    );
+
+    if (!existingProvider) {
+        existingUser.oauth.providers.push({
+            providerName: "slack",
+            sub: userFromSlack.user.id
+        });
+        await existingUser.save({ validateBeforeSave: false });
+    }
+
+    const { accessToken, refreshToken } = await generateAccessTokenAndRefreshToken(existingUser);
+
+    return res.cookie('accessToken', accessToken, cookieOptions)
+        .cookie('refreshToken', refreshToken, cookieOptions)
+        .redirect(302, `${APPURL}?status=${encodeURIComponent("User logged in successfully")}`);
+
+} else {
+    // Create new user from Slack response
+    const user = await User.create({
+        username: userFromSlack.user.name,
+        email: userFromSlack.user.email,
+        avatar: userFromSlack.user.image_192 || 
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(userFromSlack.user.name)}&background=random&rounded=true&format=png&size=128`,
+        isVerified: true, // Slack emails are verified
+        oauth: {
+            providers: [{
+                providerName: "slack",
+                sub: userFromSlack.user.id
+            }]
+        },
+        password: 123456, // Or generate random password
+        verificationToken: null,
+        verificationTokenExpiryDate: null
+    });
+
+    const createdUser = await User.findByIdAndUpdate(user._id, {
+        $unset: { password: 1 }
+    }).select('-password -refreshToken');
+
+    if (!createdUser) {
+        throw new apiError(500, "User not created, something went wrong while registering the user");
+    }
+
+    const { accessToken, refreshToken } = await generateAccessTokenAndRefreshToken(user);
+
+    return res.status(200)
+        .cookie("accessToken", accessToken, cookieOptions)
+        .cookie("refreshToken", refreshToken, cookieOptions)
+        .redirect(302, `${APPURL}?status=${encodeURIComponent("User registered successfully")}`);
+}} catch (error) {
+            console.error("Error during token retrieval:", error);
+            res.status(500).json({ message: 'Authentication failed', error: error.message });
+        }}
+          else {
+        console.log("No authorization code provided");
+        res.status(400).json('Authorization code not provided');
+    }
+  
+};
+
+               
+                
+                
+
+
+
 export {
     registerUser,
     registerOauthUser,
@@ -802,5 +901,6 @@ export {
     handleSpotifyOauthCallback,
     handleFacebookOauthCallback,
     handleMicrosoftOauthCallback,
+    handleSlackOauthCallback,
     getUserDetails,
 }
