@@ -20,7 +20,8 @@ import {
     handleSpotifyOauthCallback,
     handleFacebookOauthCallback,
     handleMicrosoftOauthCallback,
-    getUserDetails
+    getUserDetails,
+    handleSlackOauthCallback
 } from '../controllers/user.controller.js';
 import { verifyJWT } from '../middlewares/auth.middleware.js';
 import { uploadFile } from '../middlewares/multer.middleware.js';
@@ -36,6 +37,7 @@ router.route("/auth/oauth/github/callback").get(handleGithubOauthCallback);
 router.route("/auth/oauth/spotify/callback").get(handleSpotifyOauthCallback);
 router.route("/auth/oauth/facebook/callback").get(handleFacebookOauthCallback);
 router.route("/auth/oauth/microsoft/callback").get(handleMicrosoftOauthCallback);
+router.route("/auth/oauth/slack/callback").get(handleSlackOauthCallback);
 
 //secured routes
 router.route("/logout").post(verifyJWT,logoutUser)

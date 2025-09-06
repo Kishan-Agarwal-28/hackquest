@@ -1,5 +1,5 @@
 import {AuthorizationCode} from "simple-oauth2"
-import {  GithubClient, GoogleClient, SpotifyClient } from "../oauth.secrets.js"
+import {  GithubClient, GoogleClient, SpotifyClient, SlackClient } from "../oauth.secrets.js"
 
 
 const generateAuthUri=(provider,scopes,providerName)=>{
@@ -31,6 +31,9 @@ const registerUserRedirectUri=(provider)=>{
             case "spotify":
                 scopes = ['user-read-private', 'user-read-email'];
                 return generateAuthUri(SpotifyClient,scopes,"spotify") 
+            case "slack" :
+                scopes = ['identity.basic', 'identity.email', 'identity.avatar'];
+                return generateAuthUri(SlackClient,scopes,"slack")
             default:
                 return undefined;
         }

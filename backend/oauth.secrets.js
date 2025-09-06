@@ -69,10 +69,25 @@ const SpotifyClient={
         authorizationMethod: 'body',
       },
 }
+const SlackClient={
+    client:{
+        id:process.env.SLACK_CLIENT_ID,
+        secret:process.env.SLACK_CLIENT_SECRET
+    },
+    auth:{
+        tokenHost:process.env.SLACK_TOKEN_HOST,
+        authorizePath: '/oauth/v2/authorize',
+        tokenPath: '/api/oauth.v2.access'
+    },
+    options: {
+        authorizationMethod: 'body',
+      },
+}
 export {
     GoogleClient,
     FacebookClient,
     GithubClient,
     MicrosoftClient,
-    SpotifyClient
+    SpotifyClient,
+    SlackClient,
 }
