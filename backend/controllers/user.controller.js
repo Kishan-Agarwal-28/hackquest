@@ -340,7 +340,7 @@ const getUserDetails=asyncHandler(async(req,res)=>{
 })
 //o-auth controllers
 const registerOauthUser=asyncHandler(async(req,res)=>{
-    const redirectUri=registerUserRedirectUri(req.query.provider)
+    const redirectUri=registerUserRedirectUri(req.query.provider,req.query.integration)
     if(redirectUri==undefined){
         throw new apiError(400,"Invalid provider")
     }
